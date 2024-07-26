@@ -11,8 +11,12 @@ type SQLiteStorage struct {
 	Db *sql.DB
 }
 
-func InitDB() (*SQLiteStorage, error) {
-	db, err := sql.Open("sqlite3", "./example.db")
+func NewSQLstorage() {
+
+}
+
+func InitDB(dbName string) (*SQLiteStorage, error) {
+	db, err := sql.Open("sqlite3", dbName)
 	if err != nil {
 
 		fmt.Println("Error opening database:", err)
