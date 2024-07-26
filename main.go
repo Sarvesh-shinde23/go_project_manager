@@ -2,12 +2,14 @@ package main
 
 import (
 	"log"
+
+	"github.com/Sarvesh-shinde23/go_project_manager/db"
 )
 
 func main() {
 
-	sqlStorage := SQLiteStorage(cfg)
-	db, err := sqlStorage.Init()
+	sqlStorage, err := db.NewSQLiteStorage("test.db")
+	db := sqlStorage.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
