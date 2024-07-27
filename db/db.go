@@ -4,16 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
-type SQLiteStorage struct {
+type PostgresStorage struct {
 	Db *sql.DB
 }
 
-// NewSQLiteStorage initializes a new SQLiteStorage with a given database file name.
-func NewSQLiteStorage(dbName string) (*SQLiteStorage, error) {
-	db, err := sql.Open("sqlite3", dbName)
+// NewPostgresStorage initializes a new PostgresStorage with a given connection string.
+func NewPostgresStorage(connStr string) (*PostgresStorage, error) {
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("error opening database: %w", err)
 	}
@@ -23,32 +23,33 @@ func NewSQLiteStorage(dbName string) (*SQLiteStorage, error) {
 		return nil, fmt.Errorf("error connecting to database: %w", err)
 	}
 
-	fmt.Println("Connected to SQLite!")
+	fmt.Println("Connected to PostgreSQL!")
 
-	return &SQLiteStorage{Db: db}, nil
+	return &PostgresStorage{Db: db}, nil
 }
 
-// Init initializes the SQLite database by creating necessary tables.
-func (s *SQLiteStorage) Init() error {
+// Init initializes the PostgreSQL database by creating necessary tables.
+func (s *PostgresStorage) Init() (*sql.DB, error) {
+	// initialize the tables
 	if err := s.createUsersTable(); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := s.createProjectsTable(); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := s.createTasksTable(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return s.Db, nil
 }
 
 // createUsersTable creates the users table if it does not exist.
-func (s *SQLiteStorage) createUsersTable() error {
+func (s *PostgresStorage) createUsersTable() error {
 	query := `CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id SERIAL PRIMARY KEY,
 		name TEXT NOT NULL,
 		email TEXT NOT NULL UNIQUE
 	);`
@@ -61,9 +62,9 @@ func (s *SQLiteStorage) createUsersTable() error {
 }
 
 // createProjectsTable creates the projects table if it does not exist.
-func (s *SQLiteStorage) createProjectsTable() error {
+func (s *PostgresStorage) createProjectsTable() error {
 	query := `CREATE TABLE IF NOT EXISTS projects (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id SERIAL PRIMARY KEY,
 		name TEXT NOT NULL
 	);`
 
@@ -75,9 +76,9 @@ func (s *SQLiteStorage) createProjectsTable() error {
 }
 
 // createTasksTable creates the tasks table if it does not exist.
-func (s *SQLiteStorage) createTasksTable() error {
+func (s *PostgresStorage) createTasksTable() error {
 	query := `CREATE TABLE IF NOT EXISTS tasks (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id SERIAL PRIMARY KEY,
 		description TEXT NOT NULL,
 		project_id INTEGER,
 		FOREIGN KEY (project_id) REFERENCES projects(id)

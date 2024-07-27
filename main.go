@@ -8,8 +8,12 @@ import (
 
 func main() {
 
-	sqlStorage, err := db.NewSQLiteStorage("test.db")
-	db := sqlStorage.Init()
+	connStr := "postgres://postgres:0000@localhost:5432/goprojectmanager?sslmode=disable"
+	storage, err := db.NewPostgresStorage(connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	db, err := storage.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
