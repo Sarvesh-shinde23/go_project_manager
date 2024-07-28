@@ -16,7 +16,8 @@ type ErrorResponse struct {
 type User struct {
 	ID        int64     `json:id`
 	FirstName string    `json:"firstName"`
-	lastName  string    `json:"lastName"`
+	LastName  string    `json:"lastName"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
+	Email     string    `json:"email"`
 }
